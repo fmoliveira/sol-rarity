@@ -1,0 +1,12 @@
+{
+  "name": "sol-rarity",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": {
+    "name": "Filipe Oliveira",
+    "email": "hi@fmoliveira.dev"
+  },
+  "dependencies": {
+    "node-fetch": "^3.0.0"
+  }
+}
