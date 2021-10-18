@@ -8,6 +8,8 @@ The market-relative rarity means that the rarity scores are only relative to the
 
 This script basically helps you find the rarest listings currently on the market, which are not necessarily the rarest items in that given collection.
 
+The rarity formula is based off the original [Rarity Tools](https://rarity.tools/) formula published on the article [Ranking Rarity: Understanding Rarity Calculation Methods](https://raritytools.medium.com/ranking-rarity-understanding-rarity-calculation-methods-86ceaeb9b98c).
+
 ## Requirements
 
 - Node.js 14+
