@@ -1,18 +1,28 @@
 import fs from "fs";
+import { exec } from "child_process";
 import fetch from "node-fetch";
 
 const collection = process.argv[2];
 
 async function extractMarketRarity() {
+  const query = encodeURIComponent(
+    JSON.stringify({
+      $match: { collectionSymbol: collection },
+      $sort: { takerAmount: 1, createdAt: -1 },
+      $skip: 0,
+      $limit: 20,
+    })
+  );
   const marketData = await fetch(
-    `https://qzlsklfacc.medianetwork.cloud/nft_for_sale?collection=${collection}`
+    `https://api-mainnet.magiceden.io/rpc/getListedNFTsByQuery?q=${query}`
   ).then((res) => res.json());
 
-  const listings = marketData.map((bae) => ({
-    tokenId: bae.name.match(/\d+/)?.[0],
+  const listings = marketData.results.map((bae) => ({
+    tokenId: bae.title.match(/\d+/)?.[0],
+    name: bae.title,
     price: bae.price,
-    attributes: bae.attributes.split(",").reduce((list, item, index) => {
-      const [key, value] = item.split(":");
+    attributes: bae.attributes.reduce((list, item, index) => {
+      const { trait_type: key, value } = item;
       return {
         ...list,
         [key ?? index]: value ? value.trim() : item,
@@ -44,7 +54,7 @@ async function extractMarketRarity() {
       const value = bae.attributes[key];
       const supply = traits[key][value];
 
-      const rarity = supply / marketData.length;
+      const rarity = supply / marketData.results.length;
       traitSupplies[key] = supply;
       traitRarities[key] = rarity;
       totalRarity += rarity;
@@ -69,9 +79,11 @@ async function extractMarketRarity() {
       rarity: calculateRarity(bae),
     }))
     .sort((a, b) => b.rarity.rarityScore - a.rarity.rarityScore)
+    // .sort((a, b) => a.price - b.price)
     // .filter((i) => i.price <= 2)
-    .map(({ tokenId, price, rarity, attributes }) => ({
+    .map(({ tokenId, name, price, rarity, attributes }) => ({
       tokenId,
+      name,
       price,
       rarityScore: Number.parseFloat((rarity.rarityScore * 100).toFixed(1)),
       // attributes: Object.values(attributes),
@@ -81,7 +93,9 @@ async function extractMarketRarity() {
     fs.mkdirSync("./output");
   }
 
-  fs.writeFileSync(`./output/${collection}.json`, JSON.stringify(rarities));
+  const filename = `./output/${collection}-magiceden.json`;
+  fs.writeFileSync(filename, JSON.stringify(rarities));
+  exec(`npx prettier -w ${filename}`);
 }
 
 extractMarketRarity();
