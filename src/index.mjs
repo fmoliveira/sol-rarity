@@ -38,7 +38,8 @@ async function extractMarketRarity() {
       price,
       rarityScore: Number.parseFloat((rarity.rarityScore * 100).toFixed(1)),
       moonRank: moonRanks?.[tokenId],
-    }));
+    }))
+    .sort((a, b) => (moonRanks ? a.moonRank - b.moonRank : 1));
 
   exportResults(collectionName, marketName, rarities);
 }
