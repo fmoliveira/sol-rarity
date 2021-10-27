@@ -7,6 +7,7 @@ import exportResults from "./utils/exportResults.mjs";
 const marketName = process.argv[2];
 const collectionName = process.argv[3];
 const moonRankName = process.argv[4];
+const floorPrice = process.argv[5];
 
 if (!Object.keys(markets).includes(marketName)) {
   throw new Error("Marketplace not supported!");
@@ -29,6 +30,7 @@ async function extractMarketRarity() {
       ...listingItem,
       rarity: calculateRarity(listingItem, traits, total),
     }))
+    .filter((i) => !floorPrice || i.price < parseFloat(floorPrice, 10))
     .sort((a, b) => b.rarity.rarityScore - a.rarity.rarityScore)
     .map(({ tokenId, name, price, rarity }) => ({
       tokenId,
