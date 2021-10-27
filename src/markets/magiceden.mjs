@@ -6,7 +6,7 @@ export default async function (collection) {
       $match: { collectionSymbol: collection },
       $sort: { takerAmount: 1, createdAt: -1 },
       $skip: 0,
-      $limit: 20,
+      $limit: 2000,
     })
   );
   const marketData = await fetch(
